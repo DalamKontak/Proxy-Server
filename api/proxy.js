@@ -1,5 +1,6 @@
 const express = require('express');
 const axios = require('axios');
+const qs = require('qs'); 
 
 const app = express();
 
@@ -11,13 +12,14 @@ app.all('*', async (req, res) => {
 
     try {
         const response = await axios({
-            method: req.method,
+            method: req.method, 
             url: url,
             headers: {
                 ...req.headers,
-                host: 'api.dkon.app' 
+                host: 'api.dkon.app',
+                'Content-Type': 'application/x-www-form-urlencoded' 
             },
-            data: req.body,
+            data: req.method === 'POST' ? qs.stringify(req.body) : undefined, 
             responseType: 'arraybuffer' 
         });
 
@@ -25,7 +27,6 @@ app.all('*', async (req, res) => {
             res.setHeader(key, value);
         });
 
-        
         res.status(response.status).send(response.data);
     } catch (error) {
         console.error('Error occurred:', error.response ? error.response.data : error.message);
